@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>არქიტექტურული ბიურო | თანამედროვე დიზაინი</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth; /* Enables smooth scroll on hash link clicks (fallback) */
+            background-color: #f8f9fa;
+            color: #343a40;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: #e9ecef; }
+        ::-webkit-scrollbar-thumb { background: #adb5bd; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #6c757d; }
+
+        /* Navbar scroll effect */
+        #navbar { transition: background-color 0.4s ease-out, box-shadow 0.4s ease-out, padding 0.4s ease-out; }
+        .navbar-scrolled {
+            background-color: rgba(255, 255, 255, 0.85) !important;
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07) !important;
+            padding-top: 0.75rem !important; padding-bottom: 0.75rem !important;
+        }
+        .navbar-scrolled .nav-link,
+        .navbar-scrolled .logo-text,
+        .navbar-scrolled #mobileMenuButton { color: #212529 !important; }
+
+        /* Nav Link Underline & Active State */
+        .nav-link { position: relative; transition: color 0.3s ease; }
+        /* Apply underline hover effect ONLY to nav-links that ARE NOT the contact button */
+        .nav-link:not(.contact-link-desktop)::after {
+            content: ''; position: absolute; width: 0; height: 2px;
+            bottom: -4px; left: 50%; transform: translateX(-50%);
+            background-color: #007bff; transition: width 0.3s ease-in-out;
+        }
+        .nav-link:not(.contact-link-desktop):hover::after,
+        .nav-link:not(.contact-link-desktop).active::after { width: 60%; }
+
+        .navbar-scrolled .nav-link:not(.contact-link-desktop)::after { background-color: #007bff; }
+        .navbar-initial .nav-link:not(.contact-link-desktop)::after { background-color: #f8f9fa; }
+
+        .nav-link.active { font-weight: 700; } /* Highlight active link */
+        .navbar-scrolled .nav-link.active:not(.contact-link-desktop) { color: #0056b3 !important; }
+        .navbar-initial .nav-link.active:not(.contact-link-desktop) { text-shadow: 0 0 5px rgba(255, 255, 255, 0.5); }
+
+
+        /* Scroll Animation */
+        .scroll-animate { opacity: 0; transform: translateY(40px); transition: opacity 0.9s cubic-bezier(0.175, 0.885, 0.32, 1.275), transform 0.9s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .scroll-animate.animated { opacity: 1; transform: translateY(0); }
+
+        /* Hero Section */
+        .hero-section { background-size: cover; background-position: center; position: relative; color: white; }
+        .hero-overlay { background: linear-gradient(45deg, rgba(0, 23, 49, 0.7), rgba(0, 58, 99, 0.5)); }
+        .hero-content h1 { font-weight: 800; text-shadow: 0px 3px 8px rgba(0,0,0,0.4); }
+        .hero-content p { font-weight: 400; text-shadow: 0px 2px 6px rgba(0,0,0,0.3); }
+        .hero-title-animate { animation: heroTextAppear 1s ease-out 0.3s forwards; opacity:0; transform: translateY(20px); }
+        .hero-subtitle-animate { animation: heroTextAppear 1s ease-out 0.6s forwards; opacity:0; transform: translateY(20px); }
+        .hero-button-animate { animation: heroButtonAppear 0.8s ease-out 0.9s forwards; opacity:0; transform: scale(0.9); }
+        @keyframes heroTextAppear { to { opacity: 1; transform: translateY(0); } }
+        @keyframes heroButtonAppear { to { opacity: 1; transform: scale(1); } }
+
+        /* Project Card */
+        .project-card { transition: transform 0.35s ease-in-out, box-shadow 0.35s ease-in-out; border: 1px solid #dee2e6; }
+        .project-card:hover { transform: translateY(-8px); box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12); }
+        .project-card img { transition: transform 0.4s ease; }
+        .project-card:hover img { transform: scale(1.03); }
+        .project-info { background-color: white; }
+        .project-category { font-size: 0.8rem; color: #007bff; font-weight: 600; letter-spacing: 0.5px; }
+
+        /* Service Item */
+        .service-item { border: 1px solid #e0e0e0; transition: all 0.3s ease-in-out; }
+        .service-item:hover { border-color: #007bff; box-shadow: 0 8px 16px rgba(0, 123, 255, 0.1); transform: translateY(-5px); }
+        .service-item .lucide { transition: transform 0.3s ease, color 0.3s ease; color: #007bff; }
+        .service-item:hover .lucide { transform: scale(1.15); color: #0056b3; }
+
+        /* Section Titles */
+        .section-title { font-weight: 700; color: #212529; position: relative; padding-bottom: 0.75rem; margin-bottom: 1rem; }
+        .section-title::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 70px; height: 3px; background-color: #007bff; border-radius: 2px; }
+        .section-subtitle { color: #495057; }
+
+        /* Buttons */
+        .btn-primary { background-color: #007bff; color: white; transition: background-color 0.3s ease, transform 0.2s ease; }
+        .btn-primary:hover { background-color: #0056b3; transform: translateY(-2px); }
+        .btn-outline-light { border: 2px solid white; color: white; transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease; }
+        .btn-outline-light:hover { background-color: white; color: #007bff; transform: translateY(-2px); }
+
+        /* Contact Form */
+        .form-input {
+            width: 100%; padding: 0.75rem 1rem; border: 1px solid #ced4da; border-radius: 0.375rem;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .form-input:focus { border-color: #007bff; outline: none; box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); }
+        .form-textarea { min-height: 120px; }
+
+        /* Footer */
+        .footer-bg { background-color: #212529; }
+        .footer-link:hover { color: #007bff !important; text-decoration: underline; }
+        .social-icon:hover svg { transform: scale(1.2); color: #007bff !important; }
+
+        /* Back to top */
+        #backToTopBtn { transition: opacity 0.3s, visibility 0.3s, transform 0.3s; background-color: #007bff; }
+        #backToTopBtn:hover { background-color: #0056b3; transform: scale(1.1); }
+
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-700 antialiased">
+
+    <header id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out py-5 md:py-6 bg-transparent navbar-initial">
+        <div class="container mx-auto px-6 lg:px-8">
+            <div class="flex justify-between items-center">
+                <a href="#hero" class="text-2xl md:text-3xl font-bold logo-text text-white transition-colors duration-300">არქიტექტი</a>
+                <nav class="hidden md:flex space-x-7 lg:space-x-10 items-center">
+                    <a href="#hero" class="nav-link text-white hover:text-gray-200 font-medium active">მთავარი</a>
+                    <a href="#about" class="nav-link text-white hover:text-gray-200 font-medium">ჩვენ შესახებ</a>
+                    <a href="#projects" class="nav-link text-white hover:text-gray-200 font-medium">პროექტები</a>
+                    <a href="#services" class="nav-link text-white hover:text-gray-200 font-medium">სერვისები</a>
+                    <a href="#contact" class="contact-link-desktop nav-link bg-white px-6 py-2.5 rounded-lg font-semibold shadow-md border-2 border-transparent hover:border-gray-300 transition-all duration-300">კონტაქტი</a>
+                </nav>
+                <div class="md:hidden">
+                    <button id="mobileMenuButton" class="text-white focus:outline-none">
+                        </button>
+                </div>
+            </div>
+        </div>
+        <div id="mobileMenu" class="hidden md:hidden shadow-xl absolute top-full left-0 right-0 mt-px border-t border-gray-200 bg-white/95 backdrop-blur-sm">
+            <a href="#hero" class="mobile-nav-link block px-6 py-4 text-gray-800 hover:bg-gray-100 transition-colors duration-300 font-medium">მთავარი</a>
+            <a href="#about" class="mobile-nav-link block px-6 py-4 text-gray-800 hover:bg-gray-100 transition-colors duration-300 font-medium">ჩვენ შესახებ</a>
+            <a href="#projects" class="mobile-nav-link block px-6 py-4 text-gray-800 hover:bg-gray-100 transition-colors duration-300 font-medium">პროექტები</a>
+            <a href="#services" class="mobile-nav-link block px-6 py-4 text-gray-800 hover:bg-gray-100 transition-colors duration-300 font-medium">სერვისები</a>
+            <a href="#contact" class="mobile-nav-link block px-6 py-4 text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-300 font-semibold text-center">კონტაქტი</a>
+        </div>
+    </header>
+
+    <main>
+
+        <section id="hero" class="hero-section relative h-screen min-h-[700px] flex items-center justify-center text-center" style="background-image: url('https://placehold.co/1920x1200/1a202c/FFFFFF?text=Modern+Architectural+Design');">
+            <div class="hero-overlay absolute inset-0"></div>
+            <div class="hero-content relative z-10 p-6 max-w-4xl mx-auto">
+                <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-8 hero-title-animate">ინოვაციური არქიტექტურა თქვენი მომავლისთვის</h1>
+                <p class="text-lg sm:text-xl md:text-2xl mb-12 hero-subtitle-animate max-w-2xl mx-auto">ჩვენ ვქმნით სივრცეებს, რომლებიც შთააგონებენ, ფუნქციონირებენ და ცვლიან გარემოს უკეთესობისკენ.</p>
+                <a href="#projects" class="hero-button-animate btn-outline-light text-lg font-semibold py-3.5 px-10 rounded-lg shadow-lg transform hover:scale-105">
+                    პროექტების ნახვა
+                </a>
+            </div>
+        </section>
+
+        <section id="about" class="py-20 md:py-28 bg-white">
+            <div class="container mx-auto px-6 lg:px-8">
+                <div class="text-center mb-16 md:mb-20 scroll-animate">
+                    <h2 class="section-title text-3xl md:text-4xl mb-4">ჩვენ შესახებ</h2>
+                    <p class="section-subtitle text-lg max-w-2xl mx-auto">გაიგეთ მეტი ჩვენი მისიის, ხედვისა და გუნდის შესახებ.</p>
+                </div>
+                <div class="grid lg:grid-cols-2 gap-12 md:gap-16 items-center">
+                    <div class="scroll-animate">
+                         <img src="https://placehold.co/700x550/343a40/FFFFFF?text=Our+Creative+Workspace" alt="ჩვენი გუნდი" class="rounded-xl shadow-2xl w-full h-auto object-cover">
+                    </div>
+                    <div class="scroll-animate">
+                        <h3 class="text-2xl font-semibold text-gray-900 mb-4">ჩვენი მისია</h3>
+                        <p class="text-gray-600 mb-6 leading-relaxed">
+                            ჩვენი მისიაა შევქმნათ გამორჩეული არქიტექტურული ნამუშევრები, რომლებიც აერთიანებს ესთეტიკას, ფუნქციონალურობასა და მდგრადობას. ჩვენ გვჯერა, რომ კარგად დაპროექტებული სივრცეები აუმჯობესებს ცხოვრების ხარისხს.
+                        </p>
+                         <h3 class="text-2xl font-semibold text-gray-900 mb-4">ჩვენი გუნდი</h3>
+                        <p class="text-gray-600 mb-6 leading-relaxed">
+                            ჩვენი გუნდი დაკომპლექტებულია გამოცდილი არქიტექტორებით, დიზაინერებითა და ინჟინრებით, რომლებსაც აერთიანებთ საერთო ვნება - შექმნან ინოვაციური და შთამაგონებელი არქიტექტურა.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="projects" class="py-20 md:py-28 bg-gray-100">
+            <div class="container mx-auto px-6 lg:px-8">
+                <div class="text-center mb-16 md:mb-20 scroll-animate">
+                    <h2 class="section-title text-3xl md:text-4xl mb-4">ჩვენი პროექტები</h2>
+                    <p class="section-subtitle text-lg max-w-2xl mx-auto">გადახედეთ ჩვენს რჩეულ ნამუშევრებს, რომლებიც ასახავს ჩვენს მრავალფეროვან გამოცდილებას.</p>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-10 md:gap-12">
+                    <div class="project-card bg-white rounded-xl shadow-lg overflow-hidden scroll-animate">
+                        <img src="https://placehold.co/800x600/007BFF/FFFFFF?text=Modern+Seaside+Villa" alt="Project 1" class="w-full h-72 object-cover">
+                        <div class="p-6 md:p-8 project-info">
+                            <p class="project-category uppercase mb-1">საცხოვრებელი</p>
+                            <h3 class="text-xl font-semibold text-gray-900">თანამედროვე ვილა ზღვისპირეთში</h3>
+                        </div>
+                    </div>
+                    <div class="project-card bg-white rounded-xl shadow-lg overflow-hidden scroll-animate" style="animation-delay: 0.1s;">
+                        <img src="https://placehold.co/800x600/6C757D/FFFFFF?text=Innovative+Office+Hub" alt="Project 2" class="w-full h-72 object-cover">
+                        <div class="p-6 md:p-8 project-info">
+                            <p class="project-category uppercase mb-1">კომერციული</p>
+                            <h3 class="text-xl font-semibold text-gray-900">ინოვაციური საოფისე ცენტრი</h3>
+                        </div>
+                    </div>
+                    <div class="project-card bg-white rounded-xl shadow-lg overflow-hidden scroll-animate" style="animation-delay: 0.2s;">
+                        <img src="https://placehold.co/800x600/28A745/FFFFFF?text=Minimalist+Apartment+Interior" alt="Project 3" class="w-full h-72 object-cover">
+                        <div class="p-6 md:p-8 project-info">
+                            <p class="project-category uppercase mb-1">ინტერიერი</p>
+                            <h3 class="text-xl font-semibold text-gray-900">მინიმალისტური ბინის ინტერიერი</h3>
+                        </div>
+                    </div>
+                     <div class="project-card bg-white rounded-xl shadow-lg overflow-hidden scroll-animate" style="animation-delay: 0.3s;">
+                        <img src="https://placehold.co/800x600/FFC107/FFFFFF?text=Public+Library+Design" alt="Project 4" class="w-full h-72 object-cover">
+                        <div class="p-6 md:p-8 project-info">
+                            <p class="project-category uppercase mb-1">საზოგადოებრივი</p>
+                            <h3 class="text-xl font-semibold text-gray-900">ქალაქის ბიბლიოთეკა</h3>
+                        </div>
+                    </div>
+                     <div class="project-card bg-white rounded-xl shadow-lg overflow-hidden scroll-animate" style="animation-delay: 0.4s;">
+                        <img src="https://placehold.co/800x600/DC3545/FFFFFF?text=Urban+Renovation+Project" alt="Project 5" class="w-full h-72 object-cover">
+                        <div class="p-6 md:p-8 project-info">
+                            <p class="project-category uppercase mb-1">ურბანული</p>
+                            <h3 class="text-xl font-semibold text-gray-900">ურბანული განახლება</h3>
+                        </div>
+                    </div>
+                     <div class="project-card bg-white rounded-xl shadow-lg overflow-hidden scroll-animate" style="animation-delay: 0.5s;">
+                        <img src="https://placehold.co/800x600/17A2B8/FFFFFF?text=Luxury+Hotel+Concept" alt="Project 6" class="w-full h-72 object-cover">
+                        <div class="p-6 md:p-8 project-info">
+                            <p class="project-category uppercase mb-1">კომერციული</p>
+                            <h3 class="text-xl font-semibold text-gray-900">სასტუმროს კონცეფცია</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="services" class="py-20 md:py-28 bg-white">
+            <div class="container mx-auto px-6 lg:px-8">
+                <div class="text-center mb-16 md:mb-20 scroll-animate">
+                    <h2 class="section-title text-3xl md:text-4xl mb-4">ჩვენი სერვისები</h2>
+                    <p class="section-subtitle text-lg max-w-2xl mx-auto">გთავაზობთ არქიტექტურული მომსახურების სრულ სპექტრს.</p>
+                </div>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
+                    <div class="service-item text-center p-6 md:p-8 bg-gray-50 rounded-xl scroll-animate">
+                        <i data-lucide="drafting-compass" class="w-12 h-12 mx-auto mb-6"></i>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">არქიტექტურული პროექტირება</h3>
+                        <p class="text-gray-600 leading-relaxed text-sm">კონცეფციიდან სამუშაო ნახაზებამდე, სრული არქიტექტურული მხარდაჭერა.</p>
+                    </div>
+                    <div class="service-item text-center p-6 md:p-8 bg-gray-50 rounded-xl scroll-animate" style="animation-delay: 0.1s;">
+                         <i data-lucide="sofa" class="w-12 h-12 mx-auto mb-6"></i>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">ინტერიერის დიზაინი</h3>
+                        <p class="text-gray-600 leading-relaxed text-sm">სივრცის დაგეგმარება, მასალების შერჩევა, ავეჯის დიზაინი და განათება.</p>
+                    </div>
+                    <div class="service-item text-center p-6 md:p-8 bg-gray-50 rounded-xl scroll-animate" style="animation-delay: 0.2s;">
+                        <i data-lucide="building-2" class="w-12 h-12 mx-auto mb-6"></i>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">ურბანული დაგეგმარება</h3>
+                        <p class="text-gray-600 leading-relaxed text-sm">მასშტაბური პროექტების დაგეგმვა, საზოგადოებრივი სივრცეების შექმნა.</p>
+                    </div>
+                     <div class="service-item text-center p-6 md:p-8 bg-gray-50 rounded-xl scroll-animate" style="animation-delay: 0.3s;">
+                        <i data-lucide="trees" class="w-12 h-12 mx-auto mb-6"></i>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">ლანდშაფტის დიზაინი</h3>
+                        <p class="text-gray-600 leading-relaxed text-sm">გარე სივრცეების მოწყობა, გამწვანება და ჰარმონიული გარემოს შექმნა.</p>
+                    </div>
+                     <div class="service-item text-center p-6 md:p-8 bg-gray-50 rounded-xl scroll-animate" style="animation-delay: 0.4s;">
+                        <i data-lucide="clipboard-check" class="w-12 h-12 mx-auto mb-6"></i>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">სამშენებლო ზედამხედველობა</h3>
+                        <p class="text-gray-600 leading-relaxed text-sm">პროექტის შესაბამისობისა და ხარისხის კონტროლი მშენებლობის პროცესში.</p>
+                    </div>
+                     <div class="service-item text-center p-6 md:p-8 bg-gray-50 rounded-xl scroll-animate" style="animation-delay: 0.5s;">
+                        <i data-lucide="messages-square" class="w-12 h-12 mx-auto mb-6"></i>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">კონსულტაცია</h3>
+                        <p class="text-gray-600 leading-relaxed text-sm">პროფესიონალური რჩევები და კონსულტაციები არქიტექტურულ საკითხებზე.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="py-20 md:py-28 bg-gray-800 text-white">
+            <div class="container mx-auto px-6 lg:px-8">
+                <div class="text-center mb-16 md:mb-20 scroll-animate">
+                    <h2 class="section-title text-3xl md:text-4xl mb-4 text-white" style="--tw-text-opacity: 1;">დაგვიკავშირდით</h2>
+                     <style> .section-title.text-white::after { background-color: white; } </style> <p class="text-lg max-w-xl mx-auto text-gray-300">გაქვთ შეკითხვები ან გსურთ პროექტის დაწყება? მოგვწერეთ!</p>
+                </div>
+                <div class="grid lg:grid-cols-2 gap-16 items-start">
+                    <div class="scroll-animate">
+                        <h3 class="text-2xl font-semibold mb-6">საკონტაქტო ფორმა</h3>
+                        <form action="#" method="POST" class="space-y-6">
+                            <div>
+                                <label for="name" class="sr-only">სახელი</label>
+                                <input type="text" name="name" id="name" autocomplete="name" class="form-input bg-gray-700 text-white border-gray-600 focus:border-blue-500" placeholder="თქვენი სახელი">
+                            </div>
+                             <div>
+                                <label for="email" class="sr-only">ელ.ფოსტა</label>
+                                <input type="email" name="email" id="email" autocomplete="email" class="form-input bg-gray-700 text-white border-gray-600 focus:border-blue-500" placeholder="თქვენი ელ.ფოსტა">
+                            </div>
+                             <div>
+                                <label for="message" class="sr-only">შეტყობინება</label>
+                                <textarea name="message" id="message" rows="4" class="form-input form-textarea bg-gray-700 text-white border-gray-600 focus:border-blue-500" placeholder="თქვენი შეტყობინება"></textarea>
+                            </div>
+                            <div>
+                                <button type="submit" class="w-full btn-primary text-lg font-semibold py-3 px-8 rounded-lg shadow-lg">
+                                    გაგზავნა
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                     <div class="scroll-animate">
+                         <h3 class="text-2xl font-semibold mb-6">ინფორმაცია</h3>
+                         <div class="space-y-6 text-gray-300">
+                             <div class="flex items-start">
+                                <i data-lucide="map-pin" class="w-6 h-6 mr-4 mt-1 text-blue-400 shrink-0"></i>
+                                <div>
+                                    <h4 class="font-semibold text-white">მისამართი</h4>
+                                    <p>რუსთაველის გამზ. 123, თბილისი, 0108, საქართველო</p>
+                                </div>
+                            </div>
+                             <div class="flex items-start">
+                                <i data-lucide="phone" class="w-6 h-6 mr-4 mt-1 text-blue-400 shrink-0"></i>
+                                <div>
+                                    <h4 class="font-semibold text-white">ტელეფონი</h4>
+                                    <p><a href="tel:+995322XXXXXX" class="hover:text-blue-300">+995 32 2XX XX XX</a></p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <i data-lucide="mail" class="w-6 h-6 mr-4 mt-1 text-blue-400 shrink-0"></i>
+                                <div>
+                                    <h4 class="font-semibold text-white">ელ.ფოსტა</h4>
+                                    <p><a href="mailto:info@architect.ge" class="hover:text-blue-300">info@architect.ge</a></p>
+                                </div>
+                            </div>
+                             <div class="flex items-start">
+                                <i data-lucide="clock" class="w-6 h-6 mr-4 mt-1 text-blue-400 shrink-0"></i>
+                                <div>
+                                    <h4 class="font-semibold text-white">სამუშაო საათები</h4>
+                                    <p>ორშაბათი - პარასკევი: 10:00 - 18:00</p>
+                                </div>
+                            </div>
+                         </div>
+                          <div class="mt-10 h-64 bg-gray-700 rounded-lg shadow-lg">
+                              <img src="https://placehold.co/600x400/4A5568/90A4AE?text=Office+Location+Map" alt="Office Map" class="w-full h-full object-cover rounded-lg opacity-80">
+                          </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="footer-bg text-gray-400 py-16">
+        <div class="container mx-auto px-6 lg:px-8 text-center">
+             <div class="flex justify-center space-x-6 mb-8">
+                <a href="#" aria-label="Facebook" class="social-icon text-gray-400 hover:text-white">
+                    <i data-lucide="facebook" class="w-6 h-6"></i>
+                </a>
+                <a href="#" aria-label="Instagram" class="social-icon text-gray-400 hover:text-white">
+                   <i data-lucide="instagram" class="w-6 h-6"></i>
+                </a>
+                <a href="#" aria-label="LinkedIn" class="social-icon text-gray-400 hover:text-white">
+                    <i data-lucide="linkedin" class="w-6 h-6"></i>
+                </a>
+                 <a href="#" aria-label="Twitter" class="social-icon text-gray-400 hover:text-white">
+                    <i data-lucide="twitter" class="w-6 h-6"></i>
+                </a>
+            </div>
+            <p>&copy; <span id="currentYear"></span> არქიტექტი. ყველა უფლება დაცულია.</p>
+        </div>
+    </footer>
+
+    <button id="backToTopBtn" title="Go to top"
+        class="fixed bottom-6 right-6 p-3.5 rounded-full text-white shadow-xl hover:bg-blue-700 transition-all duration-300 opacity-0 invisible z-50">
+        <i data-lucide="arrow-up" class="w-6 h-6"></i>
+    </button>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (typeof lucide === 'undefined') {
+                console.error('Lucide library not loaded.');
+                return;
+            }
+
+            const navbar = document.getElementById('navbar');
+            const navLinks = navbar.querySelectorAll('nav > a.nav-link');
+            const mobileNavLinks = document.querySelectorAll('#mobileMenu a.mobile-nav-link');
+            const logoText = navbar.querySelector('.logo-text');
+            const mobileMenuButton = document.getElementById('mobileMenuButton');
+            const contactButtonDesktop = navbar.querySelector('.contact-link-desktop');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const sections = document.querySelectorAll('main section[id]'); // Get all sections with an ID
+
+            // Set initial mobile menu icon
+            if (mobileMenuButton) {
+                mobileMenuButton.innerHTML = '<i data-lucide="menu" class="w-7 h-7"></i>';
+            }
+            lucide.createIcons();
+
+            function updateNavbarStyle() {
+                const scrolled = window.scrollY > 50;
+                if (!navbar) return;
+
+                navbar.classList.toggle('navbar-scrolled', scrolled);
+                navbar.classList.toggle('navbar-initial', !scrolled);
+                navbar.classList.toggle('py-5', !scrolled);
+                navbar.classList.toggle('md:py-6', !scrolled);
+                navbar.classList.toggle('bg-transparent', !scrolled);
+                navbar.classList.toggle('py-3', scrolled);
+                navbar.classList.toggle('md:py-3', scrolled);
+
+                const color = scrolled ? '#212529' : 'white';
+                if (logoText) logoText.style.color = color;
+                if (mobileMenuButton) mobileMenuButton.style.color = color;
+
+                navLinks.forEach(link => {
+                    if (link !== contactButtonDesktop) {
+                        link.style.color = color;
+                    }
+                });
+
+                if (contactButtonDesktop) {
+                    if (scrolled) {
+                        contactButtonDesktop.style.color = 'white';
+                        contactButtonDesktop.style.backgroundColor = '#007bff';
+                        contactButtonDesktop.classList.add('hover:bg-blue-700');
+                        contactButtonDesktop.classList.remove('hover:bg-gray-200');
+                    } else {
+                        contactButtonDesktop.style.color = '#212529';
+                        contactButtonDesktop.style.backgroundColor = 'white';
+                        contactButtonDesktop.classList.add('hover:bg-gray-200');
+                        contactButtonDesktop.classList.remove('hover:bg-blue-700');
+                    }
+                }
+            }
+
+            if (navbar) { updateNavbarStyle(); window.addEventListener('scroll', updateNavbarStyle); }
+
+            // Mobile menu toggle
+            if (mobileMenuButton && mobileMenu) {
+                mobileMenuButton.addEventListener('click', () => {
+                    const isHidden = mobileMenu.classList.toggle('hidden');
+                    mobileMenuButton.setAttribute('aria-expanded', String(!isHidden));
+                    mobileMenuButton.innerHTML = isHidden ? '<i data-lucide="menu" class="w-7 h-7"></i>' : '<i data-lucide="x" class="w-7 h-7"></i>';
+                    lucide.createIcons();
+                });
+            }
+
+            // Smooth Scrolling
+            function smoothScroll(event) {
+                event.preventDefault();
+                const targetId = event.currentTarget.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    const navbarHeight = navbar ? navbar.offsetHeight : 0;
+                    const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - navbarHeight - 10; // Adjust for nav height + offset
+
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+
+                    // Close mobile menu on click
+                    if(mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                        mobileMenuButton.innerHTML = '<i data-lucide="menu" class="w-7 h-7"></i>';
+                        lucide.createIcons();
+                    }
+                }
+            }
+
+            navLinks.forEach(link => link.addEventListener('click', smoothScroll));
+            mobileNavLinks.forEach(link => link.addEventListener('click', smoothScroll));
+            document.querySelector('.logo-text').addEventListener('click', smoothScroll);
+            document.querySelector('.hero-button-animate').addEventListener('click', smoothScroll);
+
+
+            // Active Link Highlighting
+            const navObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.getAttribute('id');
+                        document.querySelectorAll('.nav-link').forEach(link => {
+                            link.classList.toggle('active', link.getAttribute('href') === `#${id}`);
+                        });
+                         document.querySelectorAll('.mobile-nav-link').forEach(link => {
+                            link.classList.toggle('bg-gray-200', link.getAttribute('href') === `#${id}`);
+                        });
+                    }
+                });
+            }, { rootMargin: "-30% 0px -70% 0px", threshold: 0.1 }); // Adjust rootMargin to trigger when section is more central
+
+            sections.forEach(section => navObserver.observe(section));
+
+
+            // Scroll animations
+            const animatedElements = document.querySelectorAll('.scroll-animate');
+            const scrollObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animated');
+                        scrollObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.15, rootMargin: "0px 0px -50px 0px" });
+            animatedElements.forEach(el => scrollObserver.observe(el));
+
+
+            // Current Year
+            const currentYearElement = document.getElementById('currentYear');
+            if (currentYearElement) currentYearElement.textContent = new Date().getFullYear();
+
+            // Back to Top Button
+            const backToTopButton = document.getElementById('backToTopBtn');
+            if (backToTopButton) {
+                window.addEventListener('scroll', () => {
+                    backToTopButton.classList.toggle('opacity-0', window.pageYOffset <= 400);
+                    backToTopButton.classList.toggle('invisible', window.pageYOffset <= 400);
+                });
+                backToTopButton.addEventListener('click', (e) => {
+                    e.preventDefault(); // Ensure it doesn't try to navigate
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            }
+
+            // Final icon render just in case
+            lucide.createIcons();
+        });
+    </script>
+
+</body>
+</html>
